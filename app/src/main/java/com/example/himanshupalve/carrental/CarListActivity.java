@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,24 +19,26 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.himanshupalve.carrental.Utils.IPUtils;
-import com.example.himanshupalve.carrental.Utils.PostRequestHandler;
-import com.example.himanshupalve.carrental.Utils.ResponseObject;
+import com.example.himanshupalve.carrental.models.Car;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class CarListActivity extends AppCompatActivity {
     RecyclerView carList;
     MyRVAdapter adapter;
-    JSONArray carDetails;
+    ArrayList<Car> carDetails;
     String address;
     String city;
     String pincode;
@@ -46,13 +47,56 @@ public class CarListActivity extends AppCompatActivity {
     Animation a;
     JSONObject searchQuery;
     Button proceed;
+
+    // [START declare_database_ref]
+    private FirebaseDatabase mydatabase;
+    private DatabaseReference mDatabase;
+    // [END declare_database_ref]
+
     private int selectedPos=-1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        carDetails=new JSONArray();
-        getDummyCars();
+        carDetails=new ArrayList<>();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_list);
+        FirebaseApp.initializeApp(this);
+
+        // [START initialize_database_ref]
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        // [END initialize_database_ref]
+
+        mydatabase = FirebaseDatabase.getInstance();
+
+        mDatabase.child("cars").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (carDetails.size() > 0)
+                    carDetails.clear();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                    Car car = ds.getValue(Car.class);
+                    carDetails.add(car);
+
+
+                    Log.d("car", car.getName());
+                }
+                if (adapter != null)
+                    adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+
+
+
+
+
+
 
         buttonRv= findViewById(R.id.button_rv);
         paddingTV= findViewById(R.id.paddingTV);
@@ -70,23 +114,21 @@ public class CarListActivity extends AppCompatActivity {
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    JSONObject o= carDetails.getJSONObject(selectedPos);
+
+                    Car o= carDetails.get(selectedPos);
 
     //                TODO: add intent and searchQuery for your activity;
                     if(selectedPos>=0){
                         startActivity(new Intent(CarListActivity.this,CarFinallizeActivity.class)
                         .putExtra("searchQuery","query")
-                        .putExtra("selectedCar",o.toString()));
+                        .putExtra("selectedCar",o.getName()));
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
             }
         });
 
-        if(savedInstanceState==null)
-            getActualCars(getIntent().getExtras());
+       // if(savedInstanceState==null)
+           // getActualCars(getIntent().getExtras());
 //        else
 //            getActualCars(savedInstanceState);
         adapter.notifyDataSetChanged();
@@ -116,56 +158,30 @@ public class CarListActivity extends AppCompatActivity {
 //        });
 //        StringRequest req =handler.postStringRequest(searchQuery);
 //        queue.add(req);
+        createDummyCars();
+    }
 
+    private void createDummyCars(){
+/*
+        Car car = new Car("BMW M5", UUID.randomUUID().toString(),4,5);
+        Car car2 = new Car("Audi A8", UUID.randomUUID().toString(),4,5);
+        Car car3 = new Car("Camry", UUID.randomUUID().toString(),4,5);
+        Car car4 = new Car("Corolla", UUID.randomUUID().toString(),4,5);
+        Car car5 = new Car("Cerato", UUID.randomUUID().toString(),4,5);
+        Car car6 = new Car("Jaguar", UUID.randomUUID().toString(),4,5);
+
+        mDatabase.child("cars").child(car.getUuid()).setValue(car);
+        mDatabase.child("cars").child(car2.getUuid()).setValue(car2);
+        mDatabase.child("cars").child(car3.getUuid()).setValue(car3);
+        mDatabase.child("cars").child(car4.getUuid()).setValue(car4);
+        mDatabase.child("cars").child(car5.getUuid()).setValue(car5);
+        mDatabase.child("cars").child(car6.getUuid()).setValue(car6);
+
+*/
+        // Log.d("Carname",mDatabase.child("cars").);
     }
-    private void getActualCars(Bundle bundle){
-        String result=bundle.getString("result");
-        String query=bundle.getString("searchQuery");
-        try {
-            JSONObject o=new JSONObject(result);
-            carDetails=o.getJSONArray("result");
-            searchQuery=new JSONObject(query);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    private void getDummyCars(){
-        carDetails=new JSONArray();
-        JSONObject o=new JSONObject();
-        try {
-            o.put("name","JAGUAR "+String.valueOf((char)('A'+4))+"Type");
-            o.put("seats","2 Seater");
-            o.put("rating",4);
-            carDetails.put(o);
-            o=new JSONObject();
-            o.put("name","Mercedes SClass");
-            o.put("seats","4 Seater");
-            o.put("rating",5);
-            carDetails.put(o);
-            o=new JSONObject();
-            o.put("name","Audi A8");
-            o.put("seats","7 Seater");
-            o.put("rating",2);
-            carDetails.put(o);
-            o=new JSONObject();
-            o.put("name","BMW M5");
-            o.put("seats","4 Seater");
-            o.put("rating",1);
-            carDetails.put(o);
-            o=new JSONObject();
-            o.put("name","BMW M5");
-            o.put("seats","3 Seater");
-            o.put("rating",3);
-            carDetails.put(o);
-            o=new JSONObject();
-            o.put("name","BMW M5");
-            o.put("seats","2 Seater");
-            o.put("rating",5);
-            carDetails.put(o);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+
+
     class MyRVAdapter extends RecyclerView.Adapter<MyRVAdapter.ViewHolder>{
 
         Context context;
@@ -186,16 +202,16 @@ public class CarListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
             holder.itemView.setSelected(false);
-            try {
-                String name=((JSONObject)carDetails.get(position)).getString("name");
-                String seat=((JSONObject) carDetails.get(position)).getString("seats");
-                String rate=((JSONObject) carDetails.get(position)).getString("rate_km");
-                String type=((JSONObject) carDetails.get(position)).getString("type");
-                String regNo=((JSONObject) carDetails.get(position)).getString("regNo");
-                Glide.with(CarListActivity.this)
-                        .load(IPUtils.getCompleteip()+"/getImage?regNo="+regNo)
-                        .into(holder.carImage);
-                int stars=((JSONObject)carDetails.get(position)).getInt("rating");
+
+                String name=(carDetails.get(position)).getName();
+                String seat=""+( carDetails.get(position)).getSeats();
+                String rate=""+( carDetails.get(position)).getRating();
+                String type=( carDetails.get(position)).getName();
+                String regNo=( carDetails.get(position)).getUuid();
+               // Glide.with(CarListActivity.this)
+             //           .load(IPUtils.getCompleteip()+"/getImage?regNo="+regNo)
+              //          .into(holder.carImage);
+                int stars=(carDetails.get(position)).getRating();
                 holder.carName.setText(name);
                 holder.seats.setText(seat);
                 holder.rate.setText(rate);
@@ -203,9 +219,7 @@ public class CarListActivity extends AppCompatActivity {
 //                holder.rating.setText(stars);
                 holder.addStars(stars);
 //                holder.addStars(position%5);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v)
@@ -231,7 +245,7 @@ public class CarListActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return carDetails.length();
+            return carDetails.size();
         }
 
         class ViewHolder extends RecyclerView.ViewHolder{
@@ -266,5 +280,7 @@ public class CarListActivity extends AppCompatActivity {
                 }
             }
         }
+
     }
+
 }
