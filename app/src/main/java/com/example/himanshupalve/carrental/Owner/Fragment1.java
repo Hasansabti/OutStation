@@ -11,20 +11,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.himanshupalve.carrental.R;
-import com.example.himanshupalve.carrental.Utils.PostRequestHandler;
-import com.example.himanshupalve.carrental.Utils.ResponseObject;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 /**
  * Created by User on 4/9/2017.
@@ -38,10 +29,10 @@ public class Fragment1 extends Fragment {
     JSONObject selected;
 
     //CarDetail
-    public static EditText Manufacturer;
+    public static EditText Carname;
     //private EditText Model;
     public static EditText RegNo;
-    public static Spinner spinner;
+    public static Spinner company;
 
 
     //Values
@@ -49,12 +40,13 @@ public class Fragment1 extends Fragment {
     public  static String cType;
     public  static String Type;
     public  static String model_no;
-    public  static  String manufacturer;
+    public  static  String car_name;
     public  static  String model;
     public  static  String regno;
+    public  static  String company_name;
 
-    public static String getManufacturer() {
-        return manufacturer;
+    public static String getCarname() {
+        return car_name;
     }
 
     public static String getModel() {
@@ -81,6 +73,10 @@ public class Fragment1 extends Fragment {
         return regno;
     }
 
+    public static String getCompany_name() {
+        return company_name;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
@@ -89,23 +85,18 @@ public class Fragment1 extends Fragment {
 
         //Values of CarDetails
         CarDetails = (Button) view.findViewById(R.id.CarDetailsNext);
-        Manufacturer = (EditText) view.findViewById(R.id.manu_name);
+        Carname = (EditText) view.findViewById(R.id.manu_name);
         //Model = (EditText) view.findViewById(R.id.model_name);
         RegNo = (EditText) view.findViewById(R.id.regNo);
-        spinner = (Spinner) view.findViewById(R.id.spinner);
+        company = (Spinner) view.findViewById(R.id.spinner);
 
 //        retrieveData();
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        company.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
               @Override
               public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                  try {
-                      JSONObject o= fa.data.getJSONObject(i);
-                      model=o.getString("name");
-                      model_no=o.getString("model_no");
-                  } catch (JSONException e) {
-                      e.printStackTrace();
-                  }
+                  company_name = company.getSelectedItem().toString();
+
 
               }
 
@@ -134,20 +125,20 @@ public class Fragment1 extends Fragment {
                 }
             }
         });
-        spinner.setAdapter(new ArrayAdapter<String>(getContext(), R.layout.support_simple_spinner_dropdown_item, fa.mode_name));
+      //  company.setAdapter(new ArrayAdapter<String>(getContext(), R.layout.support_simple_spinner_dropdown_item, fa.mode_name));
 
         return view;
     }
     private boolean validate(){
         boolean valid = true ;
-        manufacturer = Manufacturer.getText().toString().trim();
+        car_name = Carname.getText().toString().trim();
         regno = RegNo.getText().toString().trim();
 
-        if((manufacturer.length() == 0)){
-            Manufacturer.setError("Invalid Manufacturer");
+        if((car_name.length() == 0)){
+            Carname.setError("Invalid Carname");
             valid=false;
         }
-        else Manufacturer.setError(null);
+        else Carname.setError(null);
 
         /*if((model.length() == 0)){
             Model.setError("Invalid Model");
@@ -155,11 +146,11 @@ public class Fragment1 extends Fragment {
         }
         else Model.setError(null);*/
 
-        if((regno.length() == 0)){
-            RegNo.setError("Invalid Registration Number");
-            valid=false;
-        }
-        else RegNo.setError(null);
+       // if((regno.length() == 0)){
+       //     RegNo.setError("Invalid Registration Number");
+       //     valid=false;
+       // }
+       // else RegNo.setError(null);
         return valid;
     }
 //        public void populate(final String model_nm){
@@ -174,7 +165,7 @@ public class Fragment1 extends Fragment {
 //                        if(res != null) {;
 //
 //
-//                            cType = res.getString("fueltype");
+//                            fType = res.getString("fueltype");
 //                            seats = res.getString("seats");
 //                            // Type = selected.getString("type");
 //                            model_no = res.getString("model_no");

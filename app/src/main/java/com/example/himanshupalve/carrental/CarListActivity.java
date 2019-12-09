@@ -2,6 +2,7 @@ package com.example.himanshupalve.carrental;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,12 +24,16 @@ import android.widget.RelativeLayout;
 import com.bumptech.glide.Glide;
 import com.example.himanshupalve.carrental.Utils.IPUtils;
 import com.example.himanshupalve.carrental.models.Car;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -206,11 +211,31 @@ public class CarListActivity extends AppCompatActivity {
                 String name=(carDetails.get(position)).getName();
                 String seat=""+( carDetails.get(position)).getSeats();
                 String rate=""+( carDetails.get(position)).getRating();
-                String type=( carDetails.get(position)).getName();
+                String type=( carDetails.get(position)).getFuel();
                 String regNo=( carDetails.get(position)).getUuid();
                // Glide.with(CarListActivity.this)
              //           .load(IPUtils.getCompleteip()+"/getImage?regNo="+regNo)
               //          .into(holder.carImage);
+
+
+            StorageReference storageRef =
+                    FirebaseStorage.getInstance().getReference();
+            storageRef.child("images/"+carDetails.get(position).getUuid()).getDownloadUrl()
+                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Got the download URL for 'users/me/profile.png'
+                             Glide.with(CarListActivity.this)
+                                       .load(uri)
+                                      .into(holder.carImage);
+                        }
+                        })
+                                .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Handle any errors
+                            }
+                        });
                 int stars=(carDetails.get(position)).getRating();
                 holder.carName.setText(name);
                 holder.seats.setText(seat);

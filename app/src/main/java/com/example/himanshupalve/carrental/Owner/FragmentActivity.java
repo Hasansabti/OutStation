@@ -30,6 +30,7 @@ public class FragmentActivity extends AppCompatActivity {
 
     private static final String TAG = "FragmentActivity";
     public static Context contextOfApplication;
+    public static FragmentActivity fa;
     private SectionsStatePagerAdapter mSectionsStatePagerAdapter;
     private ViewPager mViewPager;
 
@@ -58,7 +59,7 @@ public class FragmentActivity extends AppCompatActivity {
 
         mViewPager = (ViewPager) findViewById(R.id.containter);
         //setup the pager
-//        setupViewPager(mViewPager);
+        setupViewPager(mViewPager);
         retrieveData();
         mViewPager.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -66,6 +67,7 @@ public class FragmentActivity extends AppCompatActivity {
                 return true;
             }
         });
+        fa = this;
 
     }
 

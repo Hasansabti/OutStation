@@ -1,8 +1,10 @@
 package com.example.himanshupalve.carrental.Owner;
 
 import android.app.Dialog;
+import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -13,24 +15,28 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.himanshupalve.carrental.LoginActivity;
 import com.example.himanshupalve.carrental.R;
 import com.example.himanshupalve.carrental.Utils.IPUtils;
-import com.example.himanshupalve.carrental.Utils.PostRequestHandler;
-import com.example.himanshupalve.carrental.Utils.ResponseObject;
+import com.example.himanshupalve.carrental.models.Car;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.UUID;
 
 
 /**
@@ -41,19 +47,24 @@ public class SecondActivity extends AppCompatActivity {
     private static final String TAG = "SecondActivity";
 
 
-    public  String manufacturer = Fragment1.getManufacturer();
+    public  String car_name = Fragment1.getCarname();
     public static String regno = Fragment1.getregno();
     public static String model = Fragment1.getModel();
+    public static String company = Fragment1.getCompany_name();
     public static String model_no  = Fragment1.getModel_no();
     public static String seats = Fragment2.seats;
     public static String city = Fragment2.city;
-    public static String cType = Fragment2.cType;
+    public static String ftype = Fragment2.fType;
     public static String fair  = Fragment3.fair;
+    public static String address  = FragmentMap.address;
+
     public static String no_of_days  = Fragment3.rent;
     public static String encodedImage = null;
     public static Bitmap bitmap = Fragment4.bitmap;
     public static String email = LoginActivity.getID();
 
+    private DatabaseReference mDatabase;
+    private StorageReference sref;
 
     private Button save;
 
@@ -73,6 +84,12 @@ public class SecondActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.second_activity_layout);
+
+        // [START initialize_database_ref]
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        sref = FirebaseStorage.getInstance().getReference();
+
+        // [END initialize_database_ref]
 
         initialize();
         setTextViews();
@@ -95,7 +112,7 @@ public class SecondActivity extends AppCompatActivity {
         carName.setText(model);
         seatstv.setText(seats);
         rate.setText(fair);
-        type.setText(cType);
+        type.setText(ftype);
         regis.setText(regno);
         carImage.setImageBitmap(bitmap);
     }
@@ -121,11 +138,11 @@ public class SecondActivity extends AppCompatActivity {
                 e.printStackTrace();
                 owner=new JSONObject();
             }
-            owner.put("mf", manufacturer);
+            owner.put("mf", car_name);
             owner.put("reg", regno);
             owner.put("model", model);
             owner.put("seats", seats);
-            owner.put("cType", cType);
+            owner.put("fType", ftype);
             owner.put("fair", fair);
             owner.put("nod", no_of_days);
             owner.put("image", encodedImage);
@@ -133,28 +150,43 @@ public class SecondActivity extends AppCompatActivity {
             owner.put("city", city);
             owner.put("model_no", model_no);
 
-            RequestQueue queue = Volley.newRequestQueue(SecondActivity.this);
-            PostRequestHandler handler=new PostRequestHandler("owner/",new ResponseObject() {
-                @Override
-                public void onResponse(JSONObject res) {
-                    try {
-                        if(res != null) {
-                            String response = res.getString("message");
-                            Toast.makeText(SecondActivity.this, response, Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                            Toast.makeText(SecondActivity.this, "Fail", Toast.LENGTH_SHORT).show();
+            Car car = new Car(car_name, UUID.randomUUID().toString(),company,ftype,city,fair,address,Integer.parseInt( seats),5,Integer.parseInt( no_of_days));
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            StorageReference ref = sref.child("images/"+car.getUuid());
+            ref.putFile(Fragment4.imageUri)            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                   // progressDialog.dismiss();
+                    Toast.makeText(SecondActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
+                }
+            })    .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                  //  progressDialog.dismiss();
+                    Toast.makeText(SecondActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-            StringRequest req =handler.postStringRequest(owner);
-            queue.add(req);
+
+            mDatabase.child("cars").child(car.getUuid()).setValue(car).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    if(FragmentActivity.fa != null){
+                        FragmentActivity.fa.finish();
+                    }
+                    finish();
+
+                }
+            });
+
+
+
+
+
+
         }
         catch (JSONException e){
             e.printStackTrace();
+            Toast.makeText(this,e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
         }
     }
 

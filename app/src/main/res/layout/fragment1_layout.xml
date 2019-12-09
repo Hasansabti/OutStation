@@ -38,10 +38,13 @@
             android:id="@+id/manu_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:layout_centerHorizontal="true"
-            android:inputType="textPersonName"
-            android:hint="Manufacturer" />
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:hint="Car name"
+            android:inputType="textPersonName" />
 
         <!--
     <EditText
@@ -74,7 +77,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginTop="83dp"
             android:layout_marginBottom="2dp"
-            />
+            android:entries="@array/company" />
 
         <!--
         <Button

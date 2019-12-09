@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="company">
+        <item>Toyota</item>
+        <item >Kia</item>
+        <item >Nissan</item>
+        <item >GMC</item>
+        <item >Ford</item>
+        <item >Hyundai</item>
+        <item >Ferrari</item>
+        <item >BMW</item>
+        <item >Lexus</item>
+    </string-array>
+
+</resources>

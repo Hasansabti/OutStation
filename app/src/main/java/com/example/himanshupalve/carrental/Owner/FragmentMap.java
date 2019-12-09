@@ -35,7 +35,7 @@ public class FragmentMap extends Fragment {
     TextView mCity;
     TextView mLocation;
     ImageView mapSnapshot;
-    String address;
+    public static String address;
     String city;
     String pincode;
     ProgressBar pb_addr;

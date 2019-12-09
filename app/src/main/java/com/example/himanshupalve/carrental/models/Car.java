@@ -1,17 +1,23 @@
 package com.example.himanshupalve.carrental.models;
 
 public class Car {
-    String name,uuid;
-    int seats,rating;
+    String name,uuid, company,fuel,city,fair,location;
+    int seats,rating,days;
 
     public Car() {
     }
 
-    public Car(String name, String uuid, int seats, int rating) {
+    public Car(String name, String uuid, String company, String fuel, String city, String fair, String location, int seats, int rating, int days) {
         this.name = name;
         this.uuid = uuid;
+        this.company = company;
+        this.fuel = fuel;
+        this.city = city;
+        this.fair = fair;
+        this.location = location;
         this.seats = seats;
         this.rating = rating;
+        this.days = days;
     }
 
     public String getName() {
@@ -44,5 +50,29 @@ public class Car {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public String getFuel() {
+        return fuel;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getFair() {
+        return fair;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public int getDays() {
+        return days;
     }
 }

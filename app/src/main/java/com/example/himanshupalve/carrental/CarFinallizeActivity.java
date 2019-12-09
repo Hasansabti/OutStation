@@ -113,22 +113,19 @@ public class CarFinallizeActivity extends AppCompatActivity {
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Intent intent = new Intent(CarFinallizeActivity.this, ResultActivity.class);
+                intent.putExtra("message","Your request has been placed");
+                startActivity(intent);
+                finish();
+
+
+                /*
                 final JSONObject request=new JSONObject();
                 final JSONObject data =new JSONObject();
                 try {
-                    long dt=new Date().getTime();
-                    request.put("timestamp",dt);
-                    request.put("desaddress",address);
-                    request.put("despincode", pincode);
-                    request.put("descity", city);
-                    request.put("deslng", lng);
-                    request.put("deslat", lat);
-                    request.put("searchQuery","query");
-                    request.put("selectedCar","camry");
-                    data.put("city","");
-                    data.put("car_id",selectedCar.getString("regNo"));
-                    data.put("datetime_ts",dt);
-                } catch (JSONException e) {
+
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 RequestQueue queue = Volley.newRequestQueue(CarFinallizeActivity.this);
@@ -142,8 +139,13 @@ public class CarFinallizeActivity extends AppCompatActivity {
                 });
                 StringRequest req =handler.postStringRequest(request);
                 queue.add(req);
+           */
             }
+
+
         });
+
+
 
     }
     public void calculateDistance() throws JSONException {

@@ -86,11 +86,11 @@ public class Fragment3 extends Fragment {
         }else Rent.setError(null);
 
 //
-//        if(Fragment1.manufacturer==null||Fragment1.manufacturer.length() == 0){
-//            Fragment1.Manufacturer.setError("Invalid Manufacturer");
+//        if(Fragment1.car_name==null||Fragment1.car_name.length() == 0){
+//            Fragment1.Carname.setError("Invalid Carname");
 //            valid=false;
 //        }
-//        else Fragment1.Manufacturer.setError(null);
+//        else Fragment1.Carname.setError(null);
 //
 //        /*if((model.length() == 0)){
 //            Model.setError("Invalid Model");
@@ -118,7 +118,7 @@ public class Fragment3 extends Fragment {
 //        }
 //        else Fragment2.City.setError(null);
 //
-//        if((Fragment2.cType==null||Fragment2.cType.length() == 0) || (!(Fragment2.cType.toUpperCase().equals("PETROL") || Fragment2.cType.toUpperCase().equals("DIESEL")))){
+//        if((Fragment2.fType==null||Fragment2.fType.length() == 0) || (!(Fragment2.fType.toUpperCase().equals("PETROL") || Fragment2.fType.toUpperCase().equals("DIESEL")))){
 //            Fragment2.Ctype.setError("Invalid Car Type");
 //            valid=false;
 //        }

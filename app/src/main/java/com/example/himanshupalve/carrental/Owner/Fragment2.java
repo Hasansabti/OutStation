@@ -30,7 +30,7 @@ public class Fragment2 extends Fragment {
 
     //Var
     public  static String seats;
-    public  static String cType;
+    public  static String fType;
     public  static String city;
 
     private FragmentActivity fa;
@@ -74,7 +74,7 @@ public class Fragment2 extends Fragment {
     private boolean validate(){
         boolean valid = true ;
         seats = Seats.getText().toString().trim();
-        cType = Ctype.getText().toString().trim();
+        fType = Ctype.getText().toString().trim();
         city = City.getText().toString().trim();
 
         if((seats.length() == 0)){
@@ -89,8 +89,8 @@ public class Fragment2 extends Fragment {
         }
         else City.setError(null);
 
-        if((cType.length() == 0) || (!(cType.toUpperCase().equals("PETROL") || cType.toUpperCase().equals("DIESEL")))){
-            Ctype.setError("Invalid Car Type");
+        if((fType.length() == 0) || (!(fType.toUpperCase().equals("91") || fType.toUpperCase().equals("95")))){
+            Ctype.setError("Invalid Fuel Type");
             valid=false;
         }
         else Ctype.setError(null);
